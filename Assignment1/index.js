@@ -4,7 +4,9 @@ const fs = require("fs");
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const TodoTask = require("./models/TodoTask");
+
+const todoRoutes = require("./routes/todos/todo-routes");
+const RequestError = require("./utils/RequestError");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,24 +22,12 @@ mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true }, () => {
 // DRY principle -- Don't Repeat Yourself.
 // Violation of DRY is -- WET: We enjoy typing, Write Everything twice etc.
 
-// Get all TODOs
-app.get("/", async (req, res) => {
-  res.json({
-    todos: await TodoTask.find({}),
-  });
+app.use("/api/v1", todoRoutes);
+
+// Unsupported Routes.
+app.use((req, res, next) => {
+  throw new RequestError(404, "Could not find this route.");
 });
-
-// Add new Todo
-app.post("/", async (req, res, next) => {
-  const todoTask = new TodoTask({
-    content: req.body.content,
-  });
-  res.json(await todoTask.save());
-});
-
-// Edit a TODO
-
-// Delete a TODO
 
 app.use((err, req, res, next) => {
   // TODO: use logging library -- Pino (Integrates well with AWS)
@@ -56,7 +46,7 @@ app.use((err, req, res, next) => {
   res.status(err.code || 500);
   res.json({
     status: "failed",
-    message: error.message || "An unknown error occurred!",
+    message: err.message || "An unknown error occurred!",
     err,
   });
 });
