@@ -4,6 +4,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon src/index.js",
+    "start:pretty": "nodemon src/index.js | pino-pretty -t",
     "test": "NODE_ENV=test jest",
     "test:win": "set NODE_ENV=test && jest"
   },
@@ -17,6 +18,7 @@
     "express-async-errors": "^3.1.1",
     "jest": "^28.1.1",
     "mongoose": "^6.3.5",
+    "pino": "^8.0.0",
     "supertest": "^6.2.3"
   },
   "description": "",
